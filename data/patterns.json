@@ -1,0 +1,106 @@
+{
+  "rules": [
+    {
+      "id": "revshell-bash-tcp",
+      "pattern": "/dev/tcp/[0-9.]+/\\d+",
+      "severity": "critical",
+      "description": "bash reverse-shell через /dev/tcp — классический паттерн обратного соединения"
+    },
+    {
+      "id": "revshell-nc-e",
+      "pattern": "nc\\s+.*-e\\s*/bin/(ba)?sh",
+      "severity": "critical",
+      "description": "netcat reverse-shell с флагом -e"
+    },
+    {
+      "id": "revshell-python",
+      "pattern": "socket\\.socket\\([^)]*\\).*subprocess\\.call",
+      "severity": "critical",
+      "description": "Python reverse-shell паттерн (socket + subprocess.call)"
+    },
+    {
+      "id": "revshell-mkfifo",
+      "pattern": "mkfifo\\s+/tmp/\\S+\\s*;.*nc\\s",
+      "severity": "critical",
+      "description": "mkfifo + nc — классическая связка для reverse-shell"
+    },
+    {
+      "id": "pipe-remote-exec",
+      "pattern": "(curl|wget)\\s+[^\\n|]*\\|\\s*(sudo\\s+)?(bash|sh|python3?)",
+      "severity": "high",
+      "description": "скачивание и немедленное исполнение удалённого кода (curl/wget | shell)"
+    },
+    {
+      "id": "b64-eval",
+      "pattern": "(eval|exec)\\s*\\(\\s*(base64_decode|base64\\.b64decode)",
+      "severity": "high",
+      "description": "выполнение кода из base64 — типичная обфускация payload'а"
+    },
+    {
+      "id": "obfuscated-exec-chain",
+      "pattern": "echo\\s+[A-Za-z0-9+/=]{40,}\\s*\\|\\s*base64\\s+-d\\s*\\|\\s*(bash|sh)",
+      "severity": "high",
+      "description": "закодированная base64-строка, распакованная и сразу исполненная"
+    },
+    {
+      "id": "chmod-tmp-exec",
+      "pattern": "chmod\\s+\\+x\\s+/(tmp|dev/shm|var/tmp)/",
+      "severity": "medium",
+      "description": "выставление флага исполнения на файл во временной директории — частый паттерн дропперов"
+    },
+    {
+      "id": "history-clear",
+      "pattern": "(history\\s+-c|unset\\s+HISTFILE|export\\s+HISTFILE=/dev/null)",
+      "severity": "medium",
+      "description": "очистка/отключение истории команд — попытка замести следы"
+    },
+    {
+      "id": "cron-persistence-add",
+      "pattern": "(crontab\\s+-l.*crontab\\s+-|echo\\s+.*>>\\s*/etc/cron)",
+      "severity": "high",
+      "description": "скрипт сам добавляет себя в cron — признак закрепления в системе"
+    },
+    {
+      "id": "ssh-key-inject",
+      "pattern": ">>\\s*~?/\\.ssh/authorized_keys",
+      "severity": "high",
+      "description": "дописывание SSH-ключа в authorized_keys — возможен бэкдор-доступ"
+    },
+    {
+      "id": "iptables-flush",
+      "pattern": "iptables\\s+-F",
+      "severity": "medium",
+      "description": "сброс правил файрвола — может открывать систему для внешнего доступа"
+    },
+    {
+      "id": "crypto-miner-strings",
+      "pattern": "(stratum\\+tcp://|xmrig|monero.*pool|cryptonight)",
+      "severity": "high",
+      "description": "строки, характерные для крипто-майнеров"
+    },
+    {
+      "id": "ld-preload-inject",
+      "pattern": "LD_PRELOAD\\s*=\\s*\\S+\\.so",
+      "severity": "high",
+      "description": "инъекция через LD_PRELOAD — техника сокрытия процессов/руткитов"
+    },
+    {
+      "id": "termux-boot-persistence",
+      "pattern": "\\.termux/boot/",
+      "severity": "medium",
+      "description": "использование Termux:Boot для автозапуска при старте устройства — проверь, легитимно ли"
+    },
+    {
+      "id": "self-delete",
+      "pattern": "rm\\s+-f\\s+[\"']?\\$0[\"']?",
+      "severity": "medium",
+      "description": "скрипт удаляет сам себя после запуска — попытка скрыть следы"
+    },
+    {
+      "id": "disable-selinux-defender",
+      "pattern": "setenforce\\s+0",
+      "severity": "medium",
+      "description": "отключение SELinux — снижение защиты системы"
+    }
+  ]
+}
